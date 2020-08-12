@@ -1,0 +1,8 @@
+.content{
+    width: 64px;
+    height: 64px;
+    background-color: royalblue;
+}
+.invalid-feedback{
+    display: block ;
+}

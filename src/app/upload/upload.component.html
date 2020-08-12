@@ -1,0 +1,133 @@
+<h2 class="display-3 text-center">Upload file</h2>
+<form name="uploadFileForm" #myForm="ngForm">
+    <div class="form-group">
+        <label for="userNameInput" 
+            class="mr-3">User name</label>
+        <input class="form-control"
+            id="userNameInput" 
+            placeholder="Enter user's name"
+            [(ngModel)]="metaData.userName"
+            name="userNameInput"
+            required
+            #userNameInput="ngModel"
+            [ngClass]="{'is-invalid': 
+            (userNameInput.invalid && userNameInput.touched) ||
+            (userNameInput.invalid && validator.triedToSubmitFormForTheFirstTime) }">
+        <div class="invalid-feedback"
+            [hidden]="userNameInput.valid ||
+            (userNameInput.untouched && !validator.triedToSubmitFormForTheFirstTime)">
+            Please, enter user's name</div>
+    </div>
+    <div class="form-inline d-flex justify-content-around mt-5">
+        <div class="form-group">
+            <label for="fileSize"
+                class="mr-3">Max file size, Bytes</label>
+            <input
+                required
+                pattern="[0-9]+"
+                class="form-control"
+                id="fileSize" 
+                placeholder="Enter file size"
+                [(ngModel)]="restrictions.fileSizeRestriction"
+                name="fileSize"
+                #fileSize="ngModel"
+                [ngClass]="{'is-invalid': fileSize.invalid }"
+                (change)="fileSizeChanged()">
+                <div class="invalid-feedback"
+                    [hidden]="fileSize.valid">
+                    Please, enter positive number <br>or 0 for disabling file size restriction</div>
+        </div>
+    </div>
+    <div class="form-inline d-flex justify-content-around mt-5">
+        <div class="form-group">
+            <label for="fileFormat" class="mr-3">Allowed file formats</label>
+            <input class="form-control"
+                id="fileFormat" 
+                placeholder="Enter file format"
+                [(ngModel)]="metaData.enteredFileFormat"
+                name="fileFormat"
+                #fileFormat="ngModel"
+                #fileFormat
+                (input)="fileFormatChanged()"
+                (changed)="fileFormatChanged()"
+                [ngClass]="{'is-invalid': !validator.formatExists &&
+                fileFormat.touched && validator.formatEntered}"
+                list="formats">
+            <datalist id="formats">
+                <option *ngFor="let value of formats" 
+                    [value]="value">
+                {{value}}
+                </option>
+            </datalist>
+                <div class="invalid-feedback"
+                    [hidden]="validator.formatExists ||
+                    fileFormat.untouched || !validator.formatEntered">
+                    This file format does not exist</div>
+        </div>
+        <button type="button" 
+            class="btn btn-primary" 
+            [disabled]="!validator.formatExists"
+            (click)="addFormat()">Add format</button>
+    </div>
+    <div class="form-inline d-flex justify-content-around mt-5">
+        <div class="form-group">
+            <label for="selectedFormats" 
+                class="mr-3">Selected formats</label>
+            <input type="text"
+                class="form-control"
+                id="selectedFormats"
+                readonly
+                name="selectedFormats"
+                [(ngModel)]="restrictions.fileFormatsRestriction_formats">
+        </div>
+        <button type="button"
+            class="btn btn-outline-danger"
+            id="clearSelectedFormats"
+            name="clearSelectedFormats"
+            [disabled]="!validator.selectedformatsExist"
+            (click)="clearFileFormatsRestriction()">Clear selected formats</button>
+    </div>
+    <div class="form-inline d-flex justify-content-around mt-5">
+        <div class="form-group">
+            <div class="custom-file">
+                <input 
+                    type="file"
+                    [(ngModel)]="metaData.selectedFileName"
+                    observeFiles
+                    class="custom-file-input"
+                    id="fileToUpload"
+                    required
+                    name="fileToUpload"
+                    #fileToUpload="ngModel"
+                    #fileToUpload
+                    [ngClass]="{'is-invalid': 
+                    (fileToUpload.invalid && validator.triedToSubmitFormForTheFirstTime) ||
+                    (fileToUpload.touched && !validator.fileHasBeenChosen &&
+                    fileToUpload.invalid && validator.chooseHaveNotBeenPerformed &&
+                    !validator.openDialogWindow)}"
+                    (change)="fileToUploadChanged($event.target.files)"
+                    (blur)="fileToUploadBlurred()"
+                    [accept]="restrictions.fileFormatsRestriction_mimeTypes">
+                <div class="invalid-feedback"
+                    [hidden]="(fileToUpload.valid || !validator.triedToSubmitFormForTheFirstTime) &&
+                    (fileToUpload.untouched || validator.fileHasBeenChosen || fileToUpload.valid ||
+                     !validator.chooseHaveNotBeenPerformed || validator.openDialogWindow)">
+                    Please, choose file</div>
+                <label class="custom-file-label" for="fileToUpload">Choose file</label>
+            </div>        
+        </div>
+        <button type="button" 
+            class="btn btn-outline-dark" 
+            (click)="showInvalids()"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Click to view reasons"
+            [hidden]="fileToUpload.valid && userNameInput.valid && fileSize.valid">
+            Can not upload file</button>
+        <button type="button" 
+            class="btn btn-outline-success" 
+            (click)="uploadFile()"
+            [hidden]="fileToUpload.invalid || userNameInput.invalid || fileSize.invalid">
+            Upload file</button>
+    </div>
+</form>
